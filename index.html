@@ -23,7 +23,27 @@
                 filter:invert(1);
             }
             .label {
-                font-family: Arial;
+                font-weight: bold;
+            }
+            button {
+                font-family: Times;
+                background-color: #19181a;
+                border: none;
+                color: white;
+                cursor: pointer;
+                margin-bottom: 15px;
+            }
+            .selected_button {
+                background-color: #333;
+            }
+            .selected {
+                opacity: 1;
+            }
+            rect {
+                opacity: 0.2;
+            }
+            line {
+                opacity: 0.2;
             }
         </style>
     </head>
@@ -58,11 +78,13 @@
                                 svg.attr("transform", d3.event.transform)
                             }))
                         .append("g")
+                        .style("width", "100%")
                         
             svg.append("rect")
                 .attr("class", "background")
                 .attr("fill", "#19181a")
-                .attr("width", width + margin.left + margin.right)
+                .style("width", "100%")
+                .style("cursor", "zoom-in")
                 .attr("height", height + margin.top + margin.bottom)
                 .on("click", function(){
                     d3.selectAll("rect").attr("opacity", 1);
@@ -81,24 +103,42 @@
             
             function display(item, bars, multiplier){
                 let macros = ["fat", "carbs", "protein", "sodium"]
+                last_x = -1
+                last_y = -1
                 for(let i = 0; i < macros.length; i++){
                     svg.data([item])
                         .append("rect")
-                            .attr("class", "data")
+                            .attr("class", "_" + item["id"])
                             .attr("x", bars[macros[i]])
                             .attr("y", 100*i)
                             .attr("width", parseFloat(item[macros[i]])*multiplier[macros[i]])
                             .attr("height", 50)
                             .attr("fill", item["fill"])
                             .on("click", function(d){
-                                highlight(d["name"], true)
+                                highlight(d["id"], true)
                             })
-                    bars[macros[i]] += parseFloat(item[macros[i]])*multiplier[macros[i]] + 1.0
+                    bars[macros[i]] += parseFloat(item[macros[i]])*multiplier[macros[i]] + 0.5
+
+                    let new_x = bars[macros[i]] - parseFloat(item[macros[i]])*multiplier[macros[i]]/2;
+                    let new_y = 100*i;
+
+                    if(last_x != -1){
+                        // draw line from last x/y to middle of this rectangle
+                        svg.append("line")
+                            .attr("class", "_" + item["id"])
+                            .attr("x1", last_x)
+                            .attr("x2", new_x)
+                            .attr("y1", last_y)
+                            .attr("y2", new_y)
+                            .attr("stroke", item["fill"])
+                    }
+                    last_x = new_x;
+                    last_y = new_y + 50;
                 }
                 // remove old labels
                 d3.selectAll(".label").remove()
                 // need to make sodium label scale dynamically
-                let macros2 = ["Fat(g)", "Carbs(g)", "Protein(g)", "Sodium(100mg)"]
+                let macros2 = ["Fat(g)", "Carbs(g)", "Protein(g)", "Sodium(" + 1/multiplier["sodium"] + "mg)"]
                 for(let i = 0; i < macros2.length; i++){
                     svg.append("text")
                         .attr("class", "label")
@@ -112,26 +152,27 @@
             function highlight_txt(id, recurse){
                d3.selectAll(".txt")
                     .style("background-color", function(d){
-                        if(d["name"] == id){
+                        if(d["id"] == id){
                             return "grey";
                         } else {
                             return "white";
                         }
                     })
-                
                 if(recurse){
                     highlight(id, false)
                 }
             }
-            
 
             function highlight(id, recurse){
-                d3.selectAll(".data")
-                    .attr("opacity", function(dat){
-                        if(dat["name"] == id){
-                            return 1
+                d3.selectAll("._" + id)
+                    .classed("selected", function(dat){
+                        console.log("tick")
+                        if(dat["id"] == id && this.classList.contains("selected")){
+                            return false;
+                        } else if(dat["id"] == id || this.classList.contains("selected")){
+                            return true;
                         } else {
-                            return 0.1
+                            return false;
                         }
                     })
                 if(recurse){
@@ -140,7 +181,15 @@
             }
             
             function change_subset(restaurant,multiplier){
-                // TO-DO change styling for tabs / buttons to show which is selected
+                // change button color by giving it selected_button class
+                d3.selectAll("button")
+                    .classed("selected_button", function(){
+                        if (this.innerHTML == restaurant){
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
 
                 let bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0}
                 d3.selectAll(".data").remove();
@@ -166,7 +215,7 @@
                         .append("td")
                         .data([item])
                             .attr("class", "img")
-                            .on("click", function(){highlight_txt(item["name"], true)})
+                            .on("click", function(){highlight_txt(item["id"], true)})
                             //.html(`<img src="./images/${restaurant}/${loaded_data[restaurant].indexOf(item)}.jpeg"style="width:50px;height:60px;">`)
                             .html(`<img src="./images/test/${dict[item["name"]]}"style="width:50px;height:60px;">`)
                 }

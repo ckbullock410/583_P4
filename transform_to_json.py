@@ -14,9 +14,10 @@ with open("./fast_food.csv", 'r') as d:
                 }
 
     for line in lines[1:]:
-        _, restaurant, description, calories, protein, fat, iron, sodium, cholesterol, carbohydrates, water = line.split(',')
+        id, restaurant, description, calories, protein, fat, iron, sodium, cholesterol, carbohydrates, water = line.split(',')
         water = water.strip()  # get rid of \n
         item = {}
+        item["id"] = id
         item["calories"] = calories
         item["sodium"] = sodium
         item["iron"] = iron
