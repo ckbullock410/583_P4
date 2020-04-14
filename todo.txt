@@ -1,0 +1,17 @@
+Gather more image icons and sort them 
+  Make hovering over the icon transition in a floating box that says the name and nutritional composition of the item
+
+Make hovering over a subsection of the bar also have the same information appear
+
+draw a line connecting the selected sections from each bar
+
+Do additive selection / toggling when clicking again, make the added selections accumulate into a seperate bar 
+to show the macro distribution of all those items. 
+
+maybe add ability to save accumulated selection and compare it to another accumulated selection. 
+
+Add labels (fat, carbs, protein, sodium)
+
+Add scales / axes (make sure it's clear what the sodium scale is)
+
+Make buttons look like tabs, and indicate which is selected.
