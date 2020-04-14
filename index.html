@@ -108,7 +108,7 @@
                 for(let i = 0; i < macros.length; i++){
                     svg.data([item])
                         .append("rect")
-                            .attr("class", "_" + item["id"])
+                            .attr("class", "_" + item["id"] + " data")
                             .attr("x", bars[macros[i]])
                             .attr("y", 100*i)
                             .attr("width", parseFloat(item[macros[i]])*multiplier[macros[i]])
@@ -125,7 +125,7 @@
                     if(last_x != -1){
                         // draw line from last x/y to middle of this rectangle
                         svg.append("line")
-                            .attr("class", "_" + item["id"])
+                            .attr("class", "_" + item["id"] + " data")
                             .attr("x1", last_x)
                             .attr("x2", new_x)
                             .attr("y1", last_y)
