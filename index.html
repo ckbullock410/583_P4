@@ -8,12 +8,31 @@
                 font-size: 10px;
                 margin: 2px;
             }
+            body{
+                background: #19181a;
+                color:#f4f4f4;
+                
+            }
+            #top,#about{
+                margin: auto;
+                width: 70%;
+                padding: 10px;
+            }
+            img{
+                filter:invert(1);
+            }
+
         </style>
     </head>
     <body>
-        <div>
+        <div id="top">
             <h1 id="pageTitle">An interactive vizualization of micronutrient content in fast food items</h1>
-            Based on the using data 
+            Based on the food dataset, this vizualization highlights four key macro nutrients found in fast food items 
+            from different chains
+            
+        </div>
+        <div>
+            <br>
         </div>
         <div id="visualization"></div>
 
@@ -38,7 +57,7 @@
                         
             svg.append("rect")
                 .attr("class", "background")
-                .attr("fill", "white")
+                .attr("fill", "#19181a")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .on("click", function(){
@@ -145,7 +164,7 @@
             const TBs_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
             const Pop_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
 
-
+           
             var randomColor = (function(){
             var golden_ratio_conjugate = 0.618033988749895;
             var h = Math.random();
@@ -192,6 +211,19 @@
         <button onclick="change_subset('KFC', KFC_Multi)" type="button">KFC</button>
         <button onclick="change_subset('Taco Bell', TBs_Multi)" type="button">Taco Bell</button>
         <button onclick="change_subset('Popeyes', Pop_Multi)" type="button">Popeyes</button>
-    </body>
+   
     <div id="text_section"></div>
+    <div id="about">
+        <h2>About</h2>
+        <br>
+        As univeristy students, fast food is a staple item in our diet, but we never truly 
+        know all the macronutrients that we put into our body. We designed this vizualization 
+        in order to help us see what we truly put into our body. 
+        
+        <h4>Insight</h4>
+        
+
+       
+    </div>
+</body>
 </html>
