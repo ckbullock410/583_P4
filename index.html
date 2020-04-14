@@ -22,7 +22,9 @@
             img{
                 filter:invert(1);
             }
-
+            .label {
+                font-family: Arial;
+            }
         </style>
     </head>
     <body>
@@ -48,7 +50,8 @@
             // add the base svg
             let svg = d3.select("#visualization")
                         .append("svg")
-                            .attr("width", width + margin.left + margin.right)
+                            //.attr("width", width + margin.left + margin.right)
+                            .style("width", "100%")
                             .attr("height", height + margin.top + margin.bottom)
                             .call(
                                 d3.zoom().on("zoom", function () {
@@ -88,10 +91,21 @@
                             .attr("height", 50)
                             .attr("fill", item["fill"])
                             .on("click", function(d){
-                                console.log(d["name"]);
                                 highlight(d["name"], true)
                             })
                     bars[macros[i]] += parseFloat(item[macros[i]])*multiplier[macros[i]] + 1.0
+                }
+                // remove old labels
+                d3.selectAll(".label").remove()
+                // need to make sodium label scale dynamically
+                let macros2 = ["Fat(g)", "Carbs(g)", "Protein(g)", "Sodium(100mg)"]
+                for(let i = 0; i < macros2.length; i++){
+                    svg.append("text")
+                        .attr("class", "label")
+                        .attr("x", bars[macros[i]] + 10)
+                        .attr("y", 100*i + 25)
+                        .attr("fill", "white")
+                        .html(macros2[i])
                 }
             }
 
@@ -148,8 +162,6 @@
                          imgs.append("tr");
                      }
                     currentCount=currentCount+1;
-                    console.log(item["name"]);
-                    console.log(dict[item["name"]]);
                     imgs
                         .append("td")
                         .data([item])
