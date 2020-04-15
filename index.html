@@ -63,10 +63,18 @@
         <div id="visualization"></div>
 
         <script>
-        const margin = {top: 10, right: 10, bottom: 10, left: 25}
+            const margin = {top: 10, right: 10, bottom: 10, left: 25}
             const width = 1200;
             const height = 400;
-            loaded_data = {}
+            let loaded_data = {}
+            let selection_amount = {
+                "fat": 0,
+                "carbs": 0,
+                "protein": 0,
+                "sodium": 0
+            }
+            let left_bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0}
+            let right_bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0}
 
             // add the base svg
             let svg = d3.select("#visualization")
@@ -110,16 +118,17 @@
                     change_subset("Burger King", BKs_Multi, "right");
                 });
             
-            function display(item, bars, multiplier, side){
+            function display(item, multiplier, side, obj){
                 let macros = ["fat", "carbs", "protein", "sodium"]
                 last_x = -1
                 last_y = -1
+                let bars = {}
                 if (side === "left"){
-                    obj = svg;
                     other_multiplier = 1
+                    bars = left_bars
                 } else {
-                    obj = svg2;
                     other_multiplier = -1
+                    bars = right_bars
                 }
 
                 for(let i = 0; i < macros.length; i++){
@@ -139,7 +148,7 @@
                             .attr("height", 50)
                             .attr("fill", item["fill"])
                             .on("click", function(d){
-                                highlight(d["id"], true)
+                                highlight(d["id"], true, side, obj)
                             })
                     bars[macros[i]] += (bar_length + 0.5)*other_multiplier
 
@@ -173,9 +182,31 @@
                                 return bars[macros[i]] - macros2[i].length*9;
                             }
                         })
-                        .attr("y", 100*i + 70)
+                        .attr("y", 100*i + 55)
                         .attr("fill", "white")
                         .html(macros2[i])
+                }
+            }
+
+            function update_selection_amount(side, obj){
+                let bars = {}
+                if(side == "left"){
+                    bars = left_bars
+                } else {
+                    bars = right_bars
+                }
+                d3.selectAll(".amounts" + side).remove()
+                let macros = ["fat", "carbs", "protein", "sodium"]
+                for(let i = 0; i < macros.length; i++){
+                    lab = round(selection_amount[macros[i]], 2)
+                    char_space = lab.toString().length*10+5
+                    offset = (side == "left" ? 10 : -char_space)
+                    obj.append("text")
+                        .attr("class", "amounts" + side)
+                        .html(lab, 2)
+                        .attr("x", bars[macros[i]] + offset)
+                        .attr("y", 100*i + 80)
+                        .attr("fill", "white")
                 }
             }
 
@@ -193,17 +224,30 @@
                 }
             }
 
-            function highlight(id, recurse){
+            function round(value, decimals) {
+                return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+            }
+
+            function highlight(id, recurse, side, obj){
                 d3.selectAll("._" + id)
                     .classed("selected", function(dat){
                         if(dat["id"] == id && this.classList.contains("selected")){
+                            selection_amount["fat"] -= round(dat["fat"], 2)
+                            selection_amount["carbs"] -= round(dat["carbs"], 2)
+                            selection_amount["protein"] -= round(dat["protein"], 2)
+                            selection_amount["sodium"] -= round(dat["sodium"], 2)
                             return false;
                         } else if(dat["id"] == id || this.classList.contains("selected")){
+                            selection_amount["fat"] += round(dat["fat"], 2)
+                            selection_amount["carbs"] += round(dat["carbs"], 2)
+                            selection_amount["protein"] += round(dat["protein"], 2)
+                            selection_amount["sodium"] += round(dat["sodium"], 2)
                             return true;
                         } else {
                             return false;
                         }
                     })
+                update_selection_amount(side, obj)
                 if(recurse){
                     highlight_txt(id, false)
                 }
@@ -219,10 +263,13 @@
                             return false
                         }
                     })
-                let bars = {}
+                
                 right_width = window.innerWidth * 0.46
+                let bars = {}
                 if(side == "left") {
-                    bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0}
+                    obj = svg
+                    left_bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0};
+                    bars = left_bars
                     d3.select("#title-left").remove()
                     svg.append("text")
                         .attr("id", "title-left")
@@ -231,7 +278,9 @@
                         .attr("y", 20)
                         .attr("fill", "white")
                 } else {
-                    bars = {"fat": right_width, "carbs": right_width, "protein": right_width, "water": right_width, "sodium": right_width}
+                    obj = svg2
+                    right_bars = {"fat": right_width, "carbs": right_width, "protein": right_width, "water": right_width, "sodium": right_width};
+                    bars = right_bars
                     d3.select("#title-right").remove()
                     svg2.append("text")
                         .attr("id", "title-right")
@@ -242,8 +291,9 @@
                 }
                 d3.selectAll(".data" + side).remove();
                 for(let item of loaded_data[restaurant]){
-                    display(item, bars, multiplier, side);
+                    display(item, multiplier, side, obj);
                 }
+                update_selection_amount(side, obj)
 
                 d3.selectAll(".img").remove()
                 let imgs = d3.select("#text_section")
