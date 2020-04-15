@@ -45,6 +45,9 @@
             line {
                 opacity: 0.2;
             }
+            svg {
+                background-color: #111;
+            }
         </style>
     </head>
     <body>
@@ -60,35 +63,40 @@
         <div id="visualization"></div>
 
         <script>
-         const margin = {top: 10, right: 10, bottom: 10, left: 10}
+        const margin = {top: 10, right: 10, bottom: 10, left: 25}
             const width = 1200;
             const height = 400;
             loaded_data = {}
 
-            let bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0}
-
             // add the base svg
             let svg = d3.select("#visualization")
                         .append("svg")
-                            //.attr("width", width + margin.left + margin.right)
-                            .style("width", "100%")
+                            .style("width", "47%")
+                            .style("margin-left", "2%")
+                            .style("margin-right", "1%")
+                            .style("margin-bottom", "15px")
                             .attr("height", height + margin.top + margin.bottom)
                             .call(
                                 d3.zoom().on("zoom", function () {
                                 svg.attr("transform", d3.event.transform)
                             }))
                         .append("g")
-                        .style("width", "100%")
-                        
-            svg.append("rect")
-                .attr("class", "background")
-                .attr("fill", "#19181a")
-                .style("width", "100%")
-                .style("cursor", "zoom-in")
-                .attr("height", height + margin.top + margin.bottom)
-                .on("click", function(){
-                    d3.selectAll("rect").attr("opacity", 1);
-                })
+                        .style("width", "45%")
+
+            let svg2 = d3.select("#visualization")
+                    .append("svg")
+                        .attr("id", "right_svg")
+                        .style("width", "47%")
+                        .style("margin-right", "2%")
+                        .style("margin-left", "1%")
+                        .style("margin-bottom", "15px")
+                        .attr("height", height + margin.top + margin.bottom)
+                        .call(
+                            d3.zoom().on("zoom", function () {
+                            svg2.attr("transform", d3.event.transform)
+                        }))
+                    .append("g")
+                    .style("width", "45%")
 
             d3.json("./data.json")
                 .then(function(data) {
@@ -98,34 +106,50 @@
                             loaded_data[resaurant][item]['fill']=randomColor();
                         }
                     }
-                    change_subset("McDonald's", MCDs_Multi);
+                    change_subset("McDonald's", MCDs_Multi, "left");
+                    change_subset("Burger King", BKs_Multi, "right");
                 });
             
-            function display(item, bars, multiplier){
+            function display(item, bars, multiplier, side){
                 let macros = ["fat", "carbs", "protein", "sodium"]
                 last_x = -1
                 last_y = -1
+                if (side === "left"){
+                    obj = svg;
+                    other_multiplier = 1
+                } else {
+                    obj = svg2;
+                    other_multiplier = -1
+                }
+
                 for(let i = 0; i < macros.length; i++){
-                    svg.data([item])
+                    bar_length = parseFloat(item[macros[i]])*multiplier[macros[i]]
+                    obj.data([item])
                         .append("rect")
-                            .attr("class", "_" + item["id"] + " data")
-                            .attr("x", bars[macros[i]])
-                            .attr("y", 100*i)
-                            .attr("width", parseFloat(item[macros[i]])*multiplier[macros[i]])
+                            .attr("class", "_" + item["id"] + " data" + side)
+                            .attr("x", function(){
+                                if(other_multiplier === -1){
+                                    return bars[macros[i]] - bar_length
+                                } else {
+                                    return bars[macros[i]]
+                                }
+                            })
+                            .attr("y", 100*i + 40)
+                            .attr("width", bar_length)
                             .attr("height", 50)
                             .attr("fill", item["fill"])
                             .on("click", function(d){
                                 highlight(d["id"], true)
                             })
-                    bars[macros[i]] += parseFloat(item[macros[i]])*multiplier[macros[i]] + 0.5
+                    bars[macros[i]] += (bar_length + 0.5)*other_multiplier
 
-                    let new_x = bars[macros[i]] - parseFloat(item[macros[i]])*multiplier[macros[i]]/2;
-                    let new_y = 100*i;
+                    let new_x = bars[macros[i]] - (bar_length/2)*other_multiplier;
+                    let new_y = 100*i + 40;
 
                     if(last_x != -1){
                         // draw line from last x/y to middle of this rectangle
-                        svg.append("line")
-                            .attr("class", "_" + item["id"] + " data")
+                        obj.append("line")
+                            .attr("class", "_" + item["id"] + " data" + side)
                             .attr("x1", last_x)
                             .attr("x2", new_x)
                             .attr("y1", last_y)
@@ -136,14 +160,20 @@
                     last_y = new_y + 50;
                 }
                 // remove old labels
-                d3.selectAll(".label").remove()
+                d3.selectAll(".label" + side).remove()
                 // need to make sodium label scale dynamically
                 let macros2 = ["Fat(g)", "Carbs(g)", "Protein(g)", "Sodium(" + 1/multiplier["sodium"] + "mg)"]
                 for(let i = 0; i < macros2.length; i++){
-                    svg.append("text")
-                        .attr("class", "label")
-                        .attr("x", bars[macros[i]] + 10)
-                        .attr("y", 100*i + 25)
+                    obj.append("text")
+                        .attr("class", "label" + side)
+                        .attr("x", function(){
+                            if(side == "left"){
+                                return bars[macros[i]] + 10;
+                            } else {
+                                return bars[macros[i]] - macros2[i].length*9;
+                            }
+                        })
+                        .attr("y", 100*i + 70)
                         .attr("fill", "white")
                         .html(macros2[i])
                 }
@@ -166,7 +196,6 @@
             function highlight(id, recurse){
                 d3.selectAll("._" + id)
                     .classed("selected", function(dat){
-                        console.log("tick")
                         if(dat["id"] == id && this.classList.contains("selected")){
                             return false;
                         } else if(dat["id"] == id || this.classList.contains("selected")){
@@ -180,7 +209,7 @@
                 }
             }
             
-            function change_subset(restaurant,multiplier){
+            function change_subset(restaurant, multiplier, side){
                 // change button color by giving it selected_button class
                 d3.selectAll("button")
                     .classed("selected_button", function(){
@@ -190,11 +219,30 @@
                             return false
                         }
                     })
-
-                let bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0}
-                d3.selectAll(".data").remove();
+                let bars = {}
+                right_width = window.innerWidth * 0.46
+                if(side == "left") {
+                    bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0}
+                    d3.select("#title-left").remove()
+                    svg.append("text")
+                        .attr("id", "title-left")
+                        .html(restaurant)
+                        .attr("x", right_width - 100)
+                        .attr("y", 20)
+                        .attr("fill", "white")
+                } else {
+                    bars = {"fat": right_width, "carbs": right_width, "protein": right_width, "water": right_width, "sodium": right_width}
+                    d3.select("#title-right").remove()
+                    svg2.append("text")
+                        .attr("id", "title-right")
+                        .html(restaurant)
+                        .attr("x", 20)
+                        .attr("y", 20)
+                        .attr("fill", "white")
+                }
+                d3.selectAll(".data" + side).remove();
                 for(let item of loaded_data[restaurant]){
-                    display(item, bars, multiplier);
+                    display(item, bars, multiplier, side);
                 }
 
                 d3.selectAll(".img").remove()
@@ -221,14 +269,14 @@
                 }
 
             }
-            const MCDs_Multi = {'fat':.5,'carbs':.5,'protein':.5,'water':.5, 'sodium':0.01};
-            const BKs_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
-            const WDs_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
-            const PH_Multi  = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
-            const DPs_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
-            const KFC_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
-            const TBs_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
-            const Pop_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.1};
+            const MCDs_Multi = {'fat':.3,'carbs':.3,'protein':.3,'water':.3, 'sodium':0.01};
+            const BKs_Multi = {'fat':1,'carbs':1,'protein':1,'water':1, 'sodium':0.01};
+            const WDs_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.01};
+            const PH_Multi  = {'fat':1,'carbs':1,'protein':1,'water':1, 'sodium':0.01};
+            const DPs_Multi = {'fat':1.5,'carbs':1.5,'protein':1.5,'water':1.5, 'sodium':0.01};
+            const KFC_Multi = {'fat':1,'carbs':1,'protein':1,'water':1, 'sodium':0.01};
+            const TBs_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.01};
+            const Pop_Multi = {'fat':2,'carbs':2,'protein':2,'water':2, 'sodium':0.01};
 
            
             var randomColor = (function(){
@@ -268,15 +316,27 @@
             })();
             
         </script>
-        
-        <button onclick="change_subset('McDonald\'s', MCDs_Multi)" type="button">McDonald's</button>
-        <button onclick="change_subset('Burger King', BKs_Multi)" type="button">Burger King</button>
-        <button onclick="change_subset('Wendy\'s', WDs_Multi)" type="button">Wendy's</button>
-        <button onclick="change_subset('Pizza Hut', PH_Multi)" type="button">Pizza Hut</button>
-        <button onclick="change_subset('Dominos', DPs_Multi)" type="button">Dominos</button>
-        <button onclick="change_subset('KFC', KFC_Multi)" type="button">KFC</button>
-        <button onclick="change_subset('Taco Bell', TBs_Multi)" type="button">Taco Bell</button>
-        <button onclick="change_subset('Popeyes', Pop_Multi)" type="button">Popeyes</button>
+        <div style="margin-right: 2%; width: 45%; display: inline;">
+        <button onclick="change_subset('McDonald\'s', MCDs_Multi, 'left')" type="button">McDonald's</button>
+        <button onclick="change_subset('Burger King', BKs_Multi, 'left')" type="button">Burger King</button>
+        <button onclick="change_subset('Wendy\'s', WDs_Multi, 'left')" type="button">Wendy's</button>
+        <button onclick="change_subset('Pizza Hut', PH_Multi, 'left')" type="button">Pizza Hut</button>
+        <button onclick="change_subset('Dominos', DPs_Multi, 'left')" type="button">Dominos</button>
+        <button onclick="change_subset('KFC', KFC_Multi, 'left')" type="button">KFC</button>
+        <button onclick="change_subset('Taco Bell', TBs_Multi, 'left')" type="button">Taco Bell</button>
+        <button onclick="change_subset('Popeyes', Pop_Multi, 'left')" type="button">Popeyes</button>
+        </div>
+
+        <div style="margin-left: 2%; width 45%; display: inline; float: right;">
+        <button onclick="change_subset('McDonald\'s', MCDs_Multi, 'right')" type="button">McDonald's</button>
+        <button onclick="change_subset('Burger King', BKs_Multi, 'right')" type="button">Burger King</button>
+        <button onclick="change_subset('Wendy\'s', WDs_Multi, 'right')" type="button">Wendy's</button>
+        <button onclick="change_subset('Pizza Hut', PH_Multi, 'right')" type="button">Pizza Hut</button>
+        <button onclick="change_subset('Dominos', DPs_Multi, 'right')" type="button">Dominos</button>
+        <button onclick="change_subset('KFC', KFC_Multi, 'right')" type="button">KFC</button>
+        <button onclick="change_subset('Taco Bell', TBs_Multi, 'right')" type="button">Taco Bell</button>
+        <button onclick="change_subset('Popeyes', Pop_Multi, 'right')" type="button">Popeyes</button>
+        </div>
    
     <div id="text_section"></div>
     <div id="about">
