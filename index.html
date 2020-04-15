@@ -14,10 +14,33 @@
                 color:#f4f4f4;
                 
             }
-            #top,#about{
+            #top{
                 margin: auto;
-                width: 70%;
+                width: 60%;
+                margin-left: 20%;
+                margin-right: 20%;
                 padding: 10px;
+            }
+            #about {
+                margin-top: 50px;
+                width: 100%;
+                color: black;
+                background: #EDc;
+            }
+            #about  h2, #about  p {
+                width: 60%;
+                margin-left: 20%;
+                margin-right: 20%;
+            }
+            h2 {
+                padding-top: 30px;
+                margin-bottom: 0px;
+            }
+            #about p {
+                padding-bottom: 40px;
+            }
+            td {
+                padding: 2px;
             }
             img{
                 filter:invert(1);
@@ -52,9 +75,11 @@
     </head>
     <body>
         <div id="top">
-            <h1 id="pageTitle">An interactive vizualization of micronutrient content in fast food items</h1>
-            Based on the food dataset, this vizualization highlights four key macro nutrients found in fast food items 
-            from different chains
+            <h1 id="pageTitle">CPSC 583: interactive vizualization of nutrients in fast food items.</h1>
+            <p style="font-size: 1em;">
+            This visualization explores different components of fast food items. Shown here are the macronutrients fat, carbohydrates
+            and protein. We've included sodium as well as it also has a large impact on the healthiness of a food item. 
+            </p>
             
         </div>
         <div>
@@ -255,17 +280,23 @@
                 }
             }
 
-            function highlight_txt(id, recurse){
-               d3.selectAll(".txt")
-                    .style("background-color", function(d){
-                        if(d["id"] == id){
-                            return "grey";
+            function highlight_txt(id, recurse, side){
+                d3.selectAll("td")
+                    .style("border", function(d){
+                        if(d["id"] == id && this.classList.contains("selected_icon")){
+                            this.classList.remove("selected_icon")
+                            return "none"
+                        } else if(d["id"] == id){
+                            this.classList.add("selected_icon")
+                            return "2px solid" + d["fill"];
+                        } else if(this.classList.contains("selected_icon")){
+                            return "2px solid" + d["fill"];
                         } else {
-                            return "white";
+                            return "none";
                         }
                     })
                 if(recurse){
-                    highlight(id, false)
+                    highlight(id, false, side)
                 }
             }
 
@@ -276,8 +307,10 @@
             function highlight(id, recurse, side, obj){
                 let selection_amount = {}
                 if(side == "left"){
+                    obj = svg
                     selection_amount = left_selection_amount
                 } else {
+                    obj = svg2
                     selection_amount = right_selection_amount
                 }
                 let added = false
@@ -307,7 +340,7 @@
                     })
                 update_selection_amount(side, obj)
                 if(recurse){
-                    highlight_txt(id, false)
+                    highlight_txt(id, false, side)
                 }
             }
             
@@ -379,6 +412,11 @@
                             console.log("clearing")
                             d3.selectAll(".data" + side)
                                 .classed("selected", false);
+                            
+                            d3.selectAll(".td" + side)
+                                .classed("selected_icon", false)
+                            
+                            highlight_txt(0, false, side)
 
                             left_selection_amount = {
                                 "fat": 0,
@@ -400,6 +438,11 @@
                                 .classed("selected", true)
                             sel_all(side, restaurant)
                             update_selection_amount(side, svg)
+
+                            d3.selectAll(".td" + side)
+                                .classed("selected_icon", true)
+                            
+                            highlight_txt(0, false, side)
                         })
                         .attr("x", 70)
                         .attr("y", 20)
@@ -425,6 +468,11 @@
                         .on("click", function(){
                             d3.selectAll(".data" + side)
                                 .classed("selected", false);
+                            
+                            d3.selectAll(".td" + side)
+                                .classed("selected_icon", false)
+                            
+                            highlight_txt(0, false, side)
 
                             right_selection_amount = {
                                 "fat": 0,
@@ -446,6 +494,12 @@
                                 .classed("selected", true)
                             sel_all(side, restaurant)
                             update_selection_amount(side, svg2)
+
+                            d3.selectAll(".td" + side)
+                                .classed("selected_icon", true)
+                            
+                            highlight_txt(0, false, side)
+
                         })
                         .attr("x", right_width - 125)
                         .attr("y", 20)
@@ -460,12 +514,17 @@
                 }
                 update_selection_amount(side, obj)
 
-                d3.selectAll(".img").remove()
-                let imgs = d3.select("#text_section")
+                let imgs = ""
+                if(side == "right"){
+                    d3.selectAll(".imgright").remove()
+                    imgs = d3.select("#right_images")
+                } else {
+                    d3.selectAll(".imgleft").remove()
+                    imgs = d3.select("#left_images")
+                }
 
-                var gridCols=23;
-                imgs.append("div")
-                imgs.append("tr")
+
+                var gridCols= Math.floor(window.innerWidth * 0.45 / 55);
 
                 var currentCount=0;
                 for(let item of loaded_data[restaurant]){
@@ -476,11 +535,14 @@
                     currentCount=currentCount+1;
                     imgs
                         .append("td")
-                        .data([item])
-                            .attr("class", "img")
-                            .on("click", function(){highlight_txt(item["id"], true)})
-                            //.html(`<img src="./images/${restaurant}/${loaded_data[restaurant].indexOf(item)}.jpeg"style="width:50px;height:60px;">`)
-                            .html(`<img src="./images/test/${dict[item["name"]]}"style="width:50px;height:60px;">`)
+                            .attr("class", "td"+side)
+                            .data([item])
+                            .append("img")
+                            .attr("src", "./images/test/" + dict[item["name"]])
+                            .style("width", 50)
+                            .style("height", 60)
+                            .attr("class", "img" + side)
+                            .on("click", function(){highlight_txt(item["id"], true, side)})
                             .on("mouseover", function(d) {
                                 let div = d3.select("body").append("div")
                                             .attr("id", "div" + d["id"])
@@ -588,19 +650,18 @@
         <button class="rb" onclick="change_subset('Taco Bell', TBs_Multi, 'right')" type="button">Taco Bell</button>
         <button class="rb" onclick="change_subset('Popeyes', Pop_Multi, 'right')" type="button">Popeyes</button>
         </div>
-   
-    <div id="text_section"></div>
+    <div style="display:flex; border-collapse: collapse;">
+    <div id="left_images" style="flex: 1; width: 45%; margin-left: 2.5%; margin-right: 2%; display: inline-block"></div>
+    <div id="right_images" style="flex: 1; width: 45%; margin-left: 2%; margin-right: 2.5%; display: inline-block"></div>
+    </div>
     <div id="about">
         <h2>About</h2>
         <br>
+        <p style="font-size: 1em;">
         As univeristy students, fast food is a staple item in our diet, but we never truly 
         know all the macronutrients that we put into our body. We designed this vizualization 
         in order to help us see what we truly put into our body. 
-        
-        <h4>Insight</h4>
-        
-
-       
+        </p>
     </div>
 </body>
 </html>
