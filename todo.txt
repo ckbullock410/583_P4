@@ -1,17 +1,7 @@
-Make hovering over the icon transition in a floating box that says the name and nutritional composition of the item
-
-Make hovering over a subsection of the bar also have the same information appear
-
-Add unselect button
-
-make check list of which micro / macros wanting to see (or different views for calories, macros, micros)
-
-Make left and right tabs independently highlighted
 
 Format icons better
 
 Rewrite Top / About sections
 
-Possibly add a help button that will tell you all the different interactions possible.
 
 

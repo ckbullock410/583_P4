@@ -301,7 +301,8 @@
             }
 
             function round(value, decimals) {
-                return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+                return parseFloat(parseFloat(value).toFixed(decimals));
+                //return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
             }
 
             function highlight(id, recurse, side, obj){
@@ -322,6 +323,7 @@
                                 selection_amount["carbs"] -= round(dat["carbs"], 2)
                                 selection_amount["protein"] -= round(dat["protein"], 2)
                                 selection_amount["sodium"] -= round(dat["sodium"], 2)
+                                console.log(selection_amount)
                                 added = true;
                             }
                             return false;
@@ -332,6 +334,7 @@
                                 selection_amount["protein"] += round(dat["protein"], 2)
                                 selection_amount["sodium"] += round(dat["sodium"], 2)
                                 added = true;
+                                console.log(selection_amount)
                             }
                             return true;
                         } else {
