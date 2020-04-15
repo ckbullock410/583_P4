@@ -156,6 +156,42 @@
                             .on("click", function(d){
                                 highlight(d["id"], true, side, obj)
                             })
+                            .on("mouseover", function(d) {
+                                let div = d3.select("body").append("div")
+                                            .attr("id", "div" + d["id"])
+                                            .style("width", "150px")
+                                            .style("height", "200px")
+                                            .style("background-color", "#EEE")
+                                            .style("top", d3.event.pageY + "px")
+                                            .style("left", d3.event.pageX + "px")
+                                            .style("position", "absolute")
+                                            .style("opacity", 0)
+                                            .style("border", "10px #EEE")
+                                            .style("border-radius", "8px")
+                                
+                                Object.keys(item).forEach(function(key){
+                                    if(key =="id" || key == "fill"){
+                                        return
+                                    }
+                                    div.append("p")
+                                        .html(key + ": " + item[key])
+                                        .style("color", "black")
+                                        .style("padding", "2px")
+                                        .style("font-size", "11px")
+                                })
+
+
+                                //Makes the new div appear on hover:
+                                div.transition()
+                                    .delay(500)
+                                    .duration(500)
+                                    .style("opacity", 1);
+                                    
+
+                            })
+                            .on("mouseout", function(d){
+                                d3.select("#div" + d["id"]).remove()
+                            })
                     bars[macros[i]] += (bar_length + 0.5)*other_multiplier
 
                     let new_x = bars[macros[i]] - (bar_length/2)*other_multiplier;
@@ -310,6 +346,18 @@
                     })
                 
                 right_width = window.innerWidth * 0.46
+                right_selection_amount = {
+                    "fat": 0,
+                    "carbs": 0,
+                    "protein": 0,
+                    "sodium": 0
+                }
+                left_selection_amount = {
+                    "fat": 0,
+                    "carbs": 0,
+                    "protein": 0,
+                    "sodium": 0
+                }
                 let bars = {}
                 if(side == "left") {
                     // add restaurant title
@@ -342,7 +390,8 @@
                         })
                         .attr("x", 20)
                         .attr("y", 20)
-                        .attr('fill', "white");
+                        .attr('fill', "white")
+                        .style("cursor", "pointer")
                     
                     svg.append("text")
                         .html("select all")
@@ -355,7 +404,8 @@
                         .attr("x", 70)
                         .attr("y", 20)
                         .attr('fill', "white")
-                    
+                        .style("cursor", "pointer")
+                   update_selection_amount(side, obj) 
 
                 } else {
                     obj = svg2
@@ -386,7 +436,8 @@
                         })
                         .attr("x", right_width - 50)
                         .attr("y", 20)
-                        .attr('fill', "white");
+                        .attr('fill', "white")
+                        .style("cursor", "pointer")
                     
                     svg2.append("text")
                         .html("select all")
@@ -399,7 +450,10 @@
                         .attr("x", right_width - 125)
                         .attr("y", 20)
                         .attr('fill', "white")
+                        .style("cursor", "pointer")
+                   update_selection_amount(side, obj) 
                 }
+
                 d3.selectAll(".data" + side).remove();
                 for(let item of loaded_data[restaurant]){
                     display(item, multiplier, side, obj);
@@ -427,6 +481,42 @@
                             .on("click", function(){highlight_txt(item["id"], true)})
                             //.html(`<img src="./images/${restaurant}/${loaded_data[restaurant].indexOf(item)}.jpeg"style="width:50px;height:60px;">`)
                             .html(`<img src="./images/test/${dict[item["name"]]}"style="width:50px;height:60px;">`)
+                            .on("mouseover", function(d) {
+                                let div = d3.select("body").append("div")
+                                            .attr("id", "div" + d["id"])
+                                            .style("width", "150px")
+                                            .style("height", "220px")
+                                            .style("background-color", "#EEE")
+                                            .style("top", d3.event.pageY + "px")
+                                            .style("left", d3.event.pageX + "px")
+                                            .style("position", "absolute")
+                                            .style("opacity", 0)
+                                            .style("border", "10px #EEE")
+                                            .style("border-radius", "8px")
+                                
+                                Object.keys(item).forEach(function(key){
+                                    if(key =="id" || key == "fill"){
+                                        return
+                                    }
+                                    div.append("p")
+                                        .html(key + ": " + item[key])
+                                        .style("color", "black")
+                                        .style("padding", "2px")
+                                        .style("font-size", "11px")
+                                })
+
+
+                                //Makes the new div appear on hover:
+                                div.transition()
+                                    .delay(500)
+                                    .duration(500)
+                                    .style("opacity", 1);
+                                    
+
+                            })
+                            .on("mouseout", function(d){
+                                d3.select("#div" + d["id"]).remove()
+                            })
                 }
 
             }
