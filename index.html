@@ -67,7 +67,13 @@
             const width = 1200;
             const height = 400;
             let loaded_data = {}
-            let selection_amount = {
+            let left_selection_amount = {
+                "fat": 0,
+                "carbs": 0,
+                "protein": 0,
+                "sodium": 0
+            }
+            let right_selection_amount = {
                 "fat": 0,
                 "carbs": 0,
                 "protein": 0,
@@ -190,10 +196,13 @@
 
             function update_selection_amount(side, obj){
                 let bars = {}
+                let selection_amount = {}
                 if(side == "left"){
                     bars = left_bars
+                    selection_amount = left_selection_amount
                 } else {
                     bars = right_bars
+                    selection_amount = right_selection_amount
                 }
                 d3.selectAll(".amounts" + side).remove()
                 let macros = ["fat", "carbs", "protein", "sodium"]
@@ -229,19 +238,32 @@
             }
 
             function highlight(id, recurse, side, obj){
+                let selection_amount = {}
+                if(side == "left"){
+                    selection_amount = left_selection_amount
+                } else {
+                    selection_amount = right_selection_amount
+                }
+                let added = false
                 d3.selectAll("._" + id)
                     .classed("selected", function(dat){
                         if(dat["id"] == id && this.classList.contains("selected")){
-                            selection_amount["fat"] -= round(dat["fat"], 2)
-                            selection_amount["carbs"] -= round(dat["carbs"], 2)
-                            selection_amount["protein"] -= round(dat["protein"], 2)
-                            selection_amount["sodium"] -= round(dat["sodium"], 2)
+                            if(!added){
+                                selection_amount["fat"] -= round(dat["fat"], 2)
+                                selection_amount["carbs"] -= round(dat["carbs"], 2)
+                                selection_amount["protein"] -= round(dat["protein"], 2)
+                                selection_amount["sodium"] -= round(dat["sodium"], 2)
+                                added = true;
+                            }
                             return false;
                         } else if(dat["id"] == id || this.classList.contains("selected")){
-                            selection_amount["fat"] += round(dat["fat"], 2)
-                            selection_amount["carbs"] += round(dat["carbs"], 2)
-                            selection_amount["protein"] += round(dat["protein"], 2)
-                            selection_amount["sodium"] += round(dat["sodium"], 2)
+                            if(!added){
+                                selection_amount["fat"] += round(dat["fat"], 2)
+                                selection_amount["carbs"] += round(dat["carbs"], 2)
+                                selection_amount["protein"] += round(dat["protein"], 2)
+                                selection_amount["sodium"] += round(dat["sodium"], 2)
+                                added = true;
+                            }
                             return true;
                         } else {
                             return false;
