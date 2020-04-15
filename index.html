@@ -516,10 +516,10 @@
 
                 let imgs = ""
                 if(side == "right"){
-                    d3.selectAll(".imgright").remove()
+                    d3.selectAll(".tdright").remove()
                     imgs = d3.select("#right_images")
                 } else {
-                    d3.selectAll(".imgleft").remove()
+                    d3.selectAll(".tdleft").remove()
                     imgs = d3.select("#left_images")
                 }
 
@@ -532,7 +532,7 @@
                          currentCount=0;
                          imgs.append("tr");
                      }
-                    currentCount=currentCount+1;
+                    
                     imgs
                         .append("td")
                             .attr("class", "td"+side)
@@ -579,6 +579,7 @@
                             .on("mouseout", function(d){
                                 d3.select("#div" + d["id"]).remove()
                             })
+                            currentCount=currentCount+1;
                 }
 
             }
@@ -640,7 +641,7 @@
         <button class="lb" onclick="change_subset('Popeyes', Pop_Multi, 'left')" type="button">Popeyes</button>
         </div>
 
-        <div style="margin-left: 2%; width 45%; display: inline; float: right;">
+        <div style="margin-left: 2%; width:45%; display: inline; float:right;">
         <button class="rb" onclick="change_subset('McDonald\'s', MCDs_Multi, 'right')" type="button">McDonald's</button>
         <button class="rb" onclick="change_subset('Burger King', BKs_Multi, 'right')" type="button">Burger King</button>
         <button class="rb" onclick="change_subset('Wendy\'s', WDs_Multi, 'right')" type="button">Wendy's</button>
