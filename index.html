@@ -33,7 +33,7 @@
                 cursor: pointer;
                 margin-bottom: 15px;
             }
-            .selected_button {
+            .selected_buttonright, .selected_buttonleft {
                 background-color: #333;
             }
             .selected {
@@ -275,10 +275,33 @@
                 }
             }
             
+            function sel_all(side, restaurant){
+                let selection_amount = {
+                    "fat": 0,
+                    "carbs": 0,
+                    "protein": 0,
+                    "sodium": 0
+                }
+                
+                for(let item of loaded_data[restaurant]){
+                    selection_amount["fat"] += round(item["fat"], 2);
+                    selection_amount["carbs"] += round(item["carbs"], 2);
+                    selection_amount["protein"] += round(item["protein"], 2);
+                    selection_amount["sodium"] += round(item["sodium"], 2);
+                }
+
+                if(side ==  "left"){
+                    left_selection_amount = selection_amount
+                } else {
+                    right_selection_amount = selection_amount
+                }
+            }
+            
             function change_subset(restaurant, multiplier, side){
                 // change button color by giving it selected_button class
-                d3.selectAll("button")
-                    .classed("selected_button", function(){
+                let sel = (side == "left" ? d3.selectAll(".lb") : d3.selectAll(".rb"))
+                sel
+                    .classed("selected_button"+side, function(){
                         if (this.innerHTML == restaurant){
                             return true
                         } else {
@@ -289,6 +312,7 @@
                 right_width = window.innerWidth * 0.46
                 let bars = {}
                 if(side == "left") {
+                    // add restaurant title
                     obj = svg
                     left_bars = {"fat": 0, "carbs": 0, "protein": 0, "water": 0, "sodium": 0};
                     bars = left_bars
@@ -299,6 +323,40 @@
                         .attr("x", right_width - 100)
                         .attr("y", 20)
                         .attr("fill", "white")
+
+                    // add clear and select all buttons
+                    svg.append("text")
+                        .html("clear")
+                        .on("click", function(){
+                            console.log("clearing")
+                            d3.selectAll(".data" + side)
+                                .classed("selected", false);
+
+                            left_selection_amount = {
+                                "fat": 0,
+                                "carbs": 0,
+                                "protein": 0,
+                                "sodium": 0
+                            };
+                            update_selection_amount(side, svg)
+                        })
+                        .attr("x", 20)
+                        .attr("y", 20)
+                        .attr('fill', "white");
+                    
+                    svg.append("text")
+                        .html("select all")
+                        .on("click", function(){
+                            d3.selectAll(".data" + side)
+                                .classed("selected", true)
+                            sel_all(side, restaurant)
+                            update_selection_amount(side, svg)
+                        })
+                        .attr("x", 70)
+                        .attr("y", 20)
+                        .attr('fill', "white")
+                    
+
                 } else {
                     obj = svg2
                     right_bars = {"fat": right_width, "carbs": right_width, "protein": right_width, "water": right_width, "sodium": right_width};
@@ -310,6 +368,37 @@
                         .attr("x", 20)
                         .attr("y", 20)
                         .attr("fill", "white")
+
+                    // add clear and select all buttons
+                    svg2.append("text")
+                        .html("clear")
+                        .on("click", function(){
+                            d3.selectAll(".data" + side)
+                                .classed("selected", false);
+
+                            right_selection_amount = {
+                                "fat": 0,
+                                "carbs": 0,
+                                "protein": 0,
+                                "sodium": 0
+                            }
+                            update_selection_amount(side, svg2)
+                        })
+                        .attr("x", right_width - 50)
+                        .attr("y", 20)
+                        .attr('fill', "white");
+                    
+                    svg2.append("text")
+                        .html("select all")
+                        .on("click", function(){
+                            d3.selectAll(".data" + side)
+                                .classed("selected", true)
+                            sel_all(side, restaurant)
+                            update_selection_amount(side, svg2)
+                        })
+                        .attr("x", right_width - 125)
+                        .attr("y", 20)
+                        .attr('fill', "white")
                 }
                 d3.selectAll(".data" + side).remove();
                 for(let item of loaded_data[restaurant]){
@@ -389,25 +478,25 @@
             
         </script>
         <div style="margin-right: 2%; width: 45%; display: inline;">
-        <button onclick="change_subset('McDonald\'s', MCDs_Multi, 'left')" type="button">McDonald's</button>
-        <button onclick="change_subset('Burger King', BKs_Multi, 'left')" type="button">Burger King</button>
-        <button onclick="change_subset('Wendy\'s', WDs_Multi, 'left')" type="button">Wendy's</button>
-        <button onclick="change_subset('Pizza Hut', PH_Multi, 'left')" type="button">Pizza Hut</button>
-        <button onclick="change_subset('Dominos', DPs_Multi, 'left')" type="button">Dominos</button>
-        <button onclick="change_subset('KFC', KFC_Multi, 'left')" type="button">KFC</button>
-        <button onclick="change_subset('Taco Bell', TBs_Multi, 'left')" type="button">Taco Bell</button>
-        <button onclick="change_subset('Popeyes', Pop_Multi, 'left')" type="button">Popeyes</button>
+        <button class="lb" onclick="change_subset('McDonald\'s', MCDs_Multi, 'left')" type="button">McDonald's</button>
+        <button class="lb" onclick="change_subset('Burger King', BKs_Multi, 'left')" type="button">Burger King</button>
+        <button class="lb" onclick="change_subset('Wendy\'s', WDs_Multi, 'left')" type="button">Wendy's</button>
+        <button class="lb" onclick="change_subset('Pizza Hut', PH_Multi, 'left')" type="button">Pizza Hut</button>
+        <button class="lb" onclick="change_subset('Dominos', DPs_Multi, 'left')" type="button">Dominos</button>
+        <button class="lb" onclick="change_subset('KFC', KFC_Multi, 'left')" type="button">KFC</button>
+        <button class="lb" onclick="change_subset('Taco Bell', TBs_Multi, 'left')" type="button">Taco Bell</button>
+        <button class="lb" onclick="change_subset('Popeyes', Pop_Multi, 'left')" type="button">Popeyes</button>
         </div>
 
         <div style="margin-left: 2%; width 45%; display: inline; float: right;">
-        <button onclick="change_subset('McDonald\'s', MCDs_Multi, 'right')" type="button">McDonald's</button>
-        <button onclick="change_subset('Burger King', BKs_Multi, 'right')" type="button">Burger King</button>
-        <button onclick="change_subset('Wendy\'s', WDs_Multi, 'right')" type="button">Wendy's</button>
-        <button onclick="change_subset('Pizza Hut', PH_Multi, 'right')" type="button">Pizza Hut</button>
-        <button onclick="change_subset('Dominos', DPs_Multi, 'right')" type="button">Dominos</button>
-        <button onclick="change_subset('KFC', KFC_Multi, 'right')" type="button">KFC</button>
-        <button onclick="change_subset('Taco Bell', TBs_Multi, 'right')" type="button">Taco Bell</button>
-        <button onclick="change_subset('Popeyes', Pop_Multi, 'right')" type="button">Popeyes</button>
+        <button class="rb" onclick="change_subset('McDonald\'s', MCDs_Multi, 'right')" type="button">McDonald's</button>
+        <button class="rb" onclick="change_subset('Burger King', BKs_Multi, 'right')" type="button">Burger King</button>
+        <button class="rb" onclick="change_subset('Wendy\'s', WDs_Multi, 'right')" type="button">Wendy's</button>
+        <button class="rb" onclick="change_subset('Pizza Hut', PH_Multi, 'right')" type="button">Pizza Hut</button>
+        <button class="rb" onclick="change_subset('Dominos', DPs_Multi, 'right')" type="button">Dominos</button>
+        <button class="rb" onclick="change_subset('KFC', KFC_Multi, 'right')" type="button">KFC</button>
+        <button class="rb" onclick="change_subset('Taco Bell', TBs_Multi, 'right')" type="button">Taco Bell</button>
+        <button class="rb" onclick="change_subset('Popeyes', Pop_Multi, 'right')" type="button">Popeyes</button>
         </div>
    
     <div id="text_section"></div>
