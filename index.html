@@ -172,7 +172,7 @@
                     bar_length = parseFloat(item[macros[i]])*multiplier[macros[i]]
                     obj.data([item])
                         .append("rect")
-                            .attr("class", "_" + item["id"] + " data" + side)
+                            .attr("class", "_" + item["id"] + side + " data" + side)
                             .attr("x", function(){
                                 if(other_multiplier === -1){
                                     return bars[macros[i]] - bar_length
@@ -231,7 +231,7 @@
                     if(last_x != -1){
                         // draw line from last x/y to middle of this rectangle
                         obj.append("line")
-                            .attr("class", "_" + item["id"] + " data" + side)
+                            .attr("class", "_" + item["id"] + side + " data" + side)
                             .attr("x1", last_x)
                             .attr("x2", new_x)
                             .attr("y1", last_y)
@@ -287,7 +287,7 @@
             }
 
             function highlight_txt(id, recurse, side){
-                d3.selectAll("td")
+                d3.selectAll(".td" + side)
                     .style("border", function(d){
                         if(d["id"] == id && this.classList.contains("selected_icon")){
                             this.classList.remove("selected_icon")
@@ -320,7 +320,7 @@
                     selection_amount = right_selection_amount
                 }
                 let added = false
-                d3.selectAll("._" + id)
+                d3.selectAll("._" + id + side)
                     .classed("selected", function(dat){
                         if(dat["id"] == id && this.classList.contains("selected")){
                             if(!added){
