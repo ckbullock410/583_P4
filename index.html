@@ -10,7 +10,7 @@
                 margin: 2px;
             }
             body{
-                background: #111;
+                background: #19181a;
                 color:#f4f4f4;
                 
             }
@@ -55,6 +55,12 @@
                 color: white;
                 cursor: pointer;
                 margin-bottom: 15px;
+            }
+            .lb{
+                float: left;
+            }
+            .rb{
+                float: right;
             }
             .selected_buttonright, .selected_buttonleft {
                 background-color: #333;
@@ -200,7 +206,7 @@
                                     }
                                     div.append("p")
                                         .html(key + ": " + item[key])
-                                        .style("color", "#111")
+                                        .style("color", "black")
                                         .style("padding", "2px")
                                         .style("font-size", "11px")
                                 })
@@ -302,7 +308,6 @@
 
             function round(value, decimals) {
                 return parseFloat(parseFloat(value).toFixed(decimals));
-                //return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
             }
 
             function highlight(id, recurse, side, obj){
@@ -565,7 +570,7 @@
                                     }
                                     div.append("p")
                                         .html(key + ": " + item[key])
-                                        .style("color", "#111")
+                                        .style("color", "black")
                                         .style("padding", "2px")
                                         .style("font-size", "11px")
                                 })
@@ -633,7 +638,7 @@
             })();
             
         </script>
-        <div style="margin-right: 2%; width: 45%; display: inline;">
+        <div style="margin-right: 2.5%; margin-left: 2%; width: 45%; display: inline-block;">
         <button class="lb" onclick="change_subset('McDonald\'s', MCDs_Multi, 'left')" type="button">McDonald's</button>
         <button class="lb" onclick="change_subset('Burger King', BKs_Multi, 'left')" type="button">Burger King</button>
         <button class="lb" onclick="change_subset('Wendy\'s', WDs_Multi, 'left')" type="button">Wendy's</button>
@@ -644,7 +649,7 @@
         <button class="lb" onclick="change_subset('Popeyes', Pop_Multi, 'left')" type="button">Popeyes</button>
         </div>
 
-        <div style="margin-left: 2%; width:45%; display: inline; float:right;">
+        <div style="margin-left: 2.5%; margin-right: 2%; width:45%; display: inline-block;">
         <button class="rb" onclick="change_subset('McDonald\'s', MCDs_Multi, 'right')" type="button">McDonald's</button>
         <button class="rb" onclick="change_subset('Burger King', BKs_Multi, 'right')" type="button">Burger King</button>
         <button class="rb" onclick="change_subset('Wendy\'s', WDs_Multi, 'right')" type="button">Wendy's</button>
