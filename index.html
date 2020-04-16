@@ -10,8 +10,10 @@
                 margin: 2px;
             }
             body{
-                background: #111;
+                background: black;
                 color:#f4f4f4;
+                font-family: 'Roboto', sans-serif;
+                font-weight: 400;
                 
             }
             #top{
@@ -49,7 +51,7 @@
                 font-weight: bold;
             }
             button {
-                font-family: Times;
+                font-family: 'Roboto', sans-serif;
                 background-color: #19181a;
                 border: none;
                 color: white;
@@ -69,13 +71,18 @@
                 opacity: 0.2;
             }
             svg {
-                background-color: #111;
+                background-color: black;
+            }
+            h1, h2, h3 {
+                font-family: 'Roboto Condensed', sans-serif;
+                text-transform: uppercase;
+                font-weight: 300;
             }
         </style>
     </head>
     <body>
         <div id="top">
-            <h1 id="pageTitle">CPSC 583: interactive vizualization of nutrients in fast food items.</h1>
+            <h1 id="pageTitle">CPSC 583: interactive vizualization of nutrients in fast food items</h1>
             <p style="font-size: 1em;">
             This visualization explores different components of fast food items. Shown here are the macronutrients fat, carbohydrates
             and protein. We've included sodium as well as it also has a large impact on the healthiness of a food item. 
@@ -200,7 +207,7 @@
                                     }
                                     div.append("p")
                                         .html(key + ": " + item[key])
-                                        .style("color", "#111")
+                                        .style("color", "Black")
                                         .style("padding", "2px")
                                         .style("font-size", "11px")
                                 })
@@ -562,7 +569,7 @@
                                     }
                                     div.append("p")
                                         .html(key + ": " + item[key])
-                                        .style("color", "#111")
+                                        .style("color", "Black")
                                         .style("padding", "2px")
                                         .style("font-size", "11px")
                                 })
@@ -659,10 +666,30 @@
         <h2>About</h2>
         <br>
         <p style="font-size: 1em;">
-        As univeristy students, fast food is a staple item in our diet, but we never truly 
-        know all the macronutrients that we put into our body. We designed this vizualization 
-        in order to help us see what we truly put into our body. 
+            As university students, fast food is a staple item in our diet, but we never truly 
+            know all the macronutrients that we put into our body. We designed this visualization 
+            in order to help us see what we truly put into our body. 
+            
+    
+            <br>
+            <br>
+            Our main goal was to make choosing healthier items at a food chains a much simpler choice, as such we took away examining 
+            all contents of their food numerically rather we do so visually. The aim behind this approach is to see if we can get people 
+            excited once again about their food choices if it became a simple thing of well can I make my graph colours look pretty, or 
+            what’s the meal I can have that is made up of just the biggest items in each bar.
+            <br>
+            <br>
+           To achieve this learning by tinkering around, we visualize this complicated data set by using an additive and subtractive model.
+            We allow users to then add items either by adding them by clicking their area of interest on the bar chart of by choosing from the visual 
+            menu at the bottom. We then change the colour to show the impact of their selection and update the total that is associated with each bar. 
+         
+    
+            <br>
+            <br>
+            Our hope is that this approach will make it more accessible for people to see the nutritional impact of their food choices.
+    
         </p>
+        
     </div>
 </body>
 </html>
