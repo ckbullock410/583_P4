@@ -58,6 +58,12 @@
                 cursor: pointer;
                 margin-bottom: 15px;
             }
+            .lb{
+                float: left;
+            }
+            .rb{
+                float: right;
+            }
             .selected_buttonright, .selected_buttonleft {
                 background-color: #333;
             }
@@ -173,7 +179,7 @@
                     bar_length = parseFloat(item[macros[i]])*multiplier[macros[i]]
                     obj.data([item])
                         .append("rect")
-                            .attr("class", "_" + item["id"] + " data" + side)
+                            .attr("class", "_" + item["id"] + side + " data" + side)
                             .attr("x", function(){
                                 if(other_multiplier === -1){
                                     return bars[macros[i]] - bar_length
@@ -207,7 +213,7 @@
                                     }
                                     div.append("p")
                                         .html(key + ": " + item[key])
-                                        .style("color", "Black")
+                                        .style("color", "black")
                                         .style("padding", "2px")
                                         .style("font-size", "11px")
                                 })
@@ -232,7 +238,7 @@
                     if(last_x != -1){
                         // draw line from last x/y to middle of this rectangle
                         obj.append("line")
-                            .attr("class", "_" + item["id"] + " data" + side)
+                            .attr("class", "_" + item["id"] + side + " data" + side)
                             .attr("x1", last_x)
                             .attr("x2", new_x)
                             .attr("y1", last_y)
@@ -288,7 +294,7 @@
             }
 
             function highlight_txt(id, recurse, side){
-                d3.selectAll("td")
+                d3.selectAll(".td" + side)
                     .style("border", function(d){
                         if(d["id"] == id && this.classList.contains("selected_icon")){
                             this.classList.remove("selected_icon")
@@ -308,7 +314,7 @@
             }
 
             function round(value, decimals) {
-                return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+                return parseFloat(parseFloat(value).toFixed(decimals));
             }
 
             function highlight(id, recurse, side, obj){
@@ -321,7 +327,7 @@
                     selection_amount = right_selection_amount
                 }
                 let added = false
-                d3.selectAll("._" + id)
+                d3.selectAll("._" + id + side)
                     .classed("selected", function(dat){
                         if(dat["id"] == id && this.classList.contains("selected")){
                             if(!added){
@@ -329,6 +335,7 @@
                                 selection_amount["carbs"] -= round(dat["carbs"], 2)
                                 selection_amount["protein"] -= round(dat["protein"], 2)
                                 selection_amount["sodium"] -= round(dat["sodium"], 2)
+                                console.log(selection_amount)
                                 added = true;
                             }
                             return false;
@@ -339,6 +346,7 @@
                                 selection_amount["protein"] += round(dat["protein"], 2)
                                 selection_amount["sodium"] += round(dat["sodium"], 2)
                                 added = true;
+                                console.log(selection_amount)
                             }
                             return true;
                         } else {
@@ -637,7 +645,7 @@
             })();
             
         </script>
-        <div style="margin-right: 2%; width: 45%; display: inline;">
+        <div style="margin-right: 2.5%; margin-left: 2%; width: 45%; display: inline-block;">
         <button class="lb" onclick="change_subset('McDonald\'s', MCDs_Multi, 'left')" type="button">McDonald's</button>
         <button class="lb" onclick="change_subset('Burger King', BKs_Multi, 'left')" type="button">Burger King</button>
         <button class="lb" onclick="change_subset('Wendy\'s', WDs_Multi, 'left')" type="button">Wendy's</button>
@@ -648,7 +656,7 @@
         <button class="lb" onclick="change_subset('Popeyes', Pop_Multi, 'left')" type="button">Popeyes</button>
         </div>
 
-        <div style="margin-left: 2%; width:45%; display: inline; float:right;">
+        <div style="margin-left: 2.5%; margin-right: 2%; width:45%; display: inline-block;">
         <button class="rb" onclick="change_subset('McDonald\'s', MCDs_Multi, 'right')" type="button">McDonald's</button>
         <button class="rb" onclick="change_subset('Burger King', BKs_Multi, 'right')" type="button">Burger King</button>
         <button class="rb" onclick="change_subset('Wendy\'s', WDs_Multi, 'right')" type="button">Wendy's</button>
@@ -670,7 +678,6 @@
             know all the macronutrients that we put into our body. We designed this visualization 
             in order to help us see what we truly put into our body. 
             
-    
             <br>
             <br>
             Our main goal was to make choosing healthier items at a food chains a much simpler choice, as such we took away examining 
